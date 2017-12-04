@@ -77,10 +77,10 @@ var _game2 = _interopRequireDefault(_game);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 document.addEventListener('DOMContentLoaded', function () {
-  var game = new _game2.default();
-  window.onload = function () {
-    game.run();
-  };
+  var canvas = document.getElementById("game-canvas");
+  var ctx = canvas.getContext("2d");
+  var game = new _game2.default(ctx);
+  game.run();
 });
 
 /***/ }),
@@ -99,16 +99,25 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Game = function () {
-  function Game() {
+  function Game(ctx) {
     _classCallCheck(this, Game);
+
+    this.ctx = ctx;
+    this.bikes = [];
+    ctx.fillStyle = "#FF0000";
+    ctx.fillRect(0, 0, 150, 75);
   }
 
   _createClass(Game, [{
     key: "run",
-    value: function run() {}
+    value: function run() {
+      requestAnimationFrame(this.render.bind(this));
+    }
   }, {
     key: "render",
-    value: function render() {}
+    value: function render() {
+      requestAnimationFrame(this.render.bind(this));
+    }
   }]);
 
   return Game;
