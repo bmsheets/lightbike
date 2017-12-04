@@ -1,0 +1,22 @@
+{
+  "name": "lightbike",
+  "version": "1.0.0",
+  "description": "A javascript/html5 game inspired by Tron",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "webpack": "webpack --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brandt Sheets",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.12.1",
+    "webpack": "^3.9.1"
+  }
+}
