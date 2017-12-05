@@ -178,6 +178,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _wall = __webpack_require__(3);
+
+var _wall2 = _interopRequireDefault(_wall);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Bike = function () {
@@ -186,17 +192,25 @@ var Bike = function () {
 
     this.x = 100;
     this.y = 75;
+    this.prevX = 100;
+    this.prevY = 75;
     this.color = "blue";
     this.direction = "E";
     this.velocity = [Bike.SPEED, 0];
     this.img = new Image();
     this.img.src = "spritesheet_vehicles.png";
+    this.wall = new _wall2.default(this);
+    this.wall.addVertex(this.centerCoords());
   }
 
   _createClass(Bike, [{
     key: "move",
     value: function move(direction) {
+      if (direction === this.direction) {
+        return;
+      }
       this.direction = direction;
+      this.wall.addVertex(this.centerCoords());
       switch (direction) {
         case "N":
           this.velocity = [0, -Bike.SPEED];
@@ -215,6 +229,8 @@ var Bike = function () {
   }, {
     key: "updatePos",
     value: function updatePos() {
+      this.prevX = this.x;
+      this.prevY = this.y;
       this.x += this.velocity[0];
       this.y += this.velocity[1];
       // Temporary wrap around level
@@ -232,11 +248,13 @@ var Bike = function () {
   }, {
     key: "render",
     value: function render(ctx) {
+      this.wall.render(ctx);
       this.updatePos();
+      var centerCoords = this.centerCoords();
       ctx.save();
-      ctx.translate(this.x + Bike.WIDTH / 2, this.y + Bike.LENGTH / 2);
+      ctx.translate(centerCoords[0], centerCoords[1]);
       ctx.rotate(this.rotationCoefficient() * Math.PI / 2);
-      ctx.translate(-(this.x + Bike.WIDTH / 2), -(this.y + Bike.LENGTH / 2));
+      ctx.translate(-centerCoords[0], -centerCoords[1]);
       ctx.drawImage(this.img, Bike.SPRITE_COORDS[this.color].x, Bike.SPRITE_COORDS[this.color].y, Bike.SPRITE_WIDTH, Bike.SPRITE_LENGTH, this.x, this.y, Bike.WIDTH, Bike.LENGTH);
       ctx.restore();
     }
@@ -244,6 +262,11 @@ var Bike = function () {
     key: "rotationCoefficient",
     value: function rotationCoefficient() {
       return Bike.DIRECTIONS.indexOf(this.direction);
+    }
+  }, {
+    key: "centerCoords",
+    value: function centerCoords() {
+      return [this.x + Bike.WIDTH / 2, this.y + Bike.LENGTH / 2];
     }
   }]);
 
@@ -267,6 +290,59 @@ Bike.SPRITE_COORDS = {
 };
 
 exports.default = Bike;
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Wall = function () {
+  function Wall(bike) {
+    _classCallCheck(this, Wall);
+
+    this.bike = bike;
+    this.color = bike.color;
+    this.vertices = [];
+  }
+
+  _createClass(Wall, [{
+    key: "render",
+    value: function render(ctx) {
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      this.vertices.forEach(function (vertex, idx) {
+        if (idx === 0) {
+          ctx.moveTo(vertex[0], vertex[1]);
+        } else {
+          ctx.lineTo(vertex[0], vertex[1]);
+        }
+      });
+      var lastVertex = this.bike.centerCoords();
+      ctx.lineTo(lastVertex[0], lastVertex[1]);
+      ctx.strokeStyle = this.color;
+      ctx.stroke();
+    }
+  }, {
+    key: "addVertex",
+    value: function addVertex(coords) {
+      this.vertices.push(coords);
+    }
+  }]);
+
+  return Wall;
+}();
+
+exports.default = Wall;
 
 /***/ })
 /******/ ]);
