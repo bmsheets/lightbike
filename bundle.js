@@ -96,6 +96,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _bike = __webpack_require__(2);
+
+var _bike2 = _interopRequireDefault(_bike);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Game = function () {
@@ -103,19 +109,35 @@ var Game = function () {
     _classCallCheck(this, Game);
 
     this.ctx = ctx;
-    this.bikes = [];
-    ctx.fillStyle = "#FF0000";
-    ctx.fillRect(0, 0, 150, 75);
+    this.bikes = [new _bike2.default()];
+    this.players = [];
   }
 
   _createClass(Game, [{
-    key: "run",
-    value: function run() {
-      requestAnimationFrame(this.render.bind(this));
+    key: 'bindKeyHandlers',
+    value: function bindKeyHandlers() {
+      var bike = this.bikes[0];
+      Object.keys(Game.MOVES).forEach(function (k) {
+        key(k, function () {
+          bike.move(Game.MOVES[k]);
+        });
+      });
     }
   }, {
-    key: "render",
+    key: 'run',
+    value: function run() {
+      this.bindKeyHandlers();
+      this.render();
+    }
+  }, {
+    key: 'render',
     value: function render() {
+      var _this = this;
+
+      this.ctx.clearRect(0, 0, Game.width, Game.height);
+      this.bikes.forEach(function (bike) {
+        return bike.render(_this.ctx);
+      });
       requestAnimationFrame(this.render.bind(this));
     }
   }]);
@@ -123,7 +145,76 @@ var Game = function () {
   return Game;
 }();
 
+Game.MOVES = {
+  w: [0, -1],
+  a: [-1, 0],
+  s: [0, 1],
+  d: [1, 0],
+  up: [0, -1],
+  left: [-1, 0],
+  down: [0, 1],
+  right: [1, 0]
+};
+
+Game.width = 800;
+Game.height = 600;
+
 exports.default = Game;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Bike = function () {
+  function Bike() {
+    _classCallCheck(this, Bike);
+
+    this.x = 0;
+    this.y = 0;
+    this.velocity = [Bike.SPEED, 0];
+    this.width = 40;
+    this.height = 20;
+    this.color = "#FF0000";
+  }
+
+  _createClass(Bike, [{
+    key: "move",
+    value: function move(vector) {
+      this.velocity[0] = vector[0] * Bike.SPEED;
+      this.velocity[1] = vector[1] * Bike.SPEED;
+    }
+  }, {
+    key: "updatePos",
+    value: function updatePos() {
+      this.x += this.velocity[0];
+      this.y += this.velocity[1];
+    }
+  }, {
+    key: "render",
+    value: function render(ctx) {
+      this.updatePos();
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+  }]);
+
+  return Bike;
+}();
+
+Bike.SPEED = 5;
+
+exports.default = Bike;
 
 /***/ })
 /******/ ]);
