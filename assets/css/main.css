@@ -1,12 +1,24 @@
+header,
+footer {
+
+}
+
+body {
+  background-color: black;
+}
+
 h1 {
   text-align: center;
   font-size: 36px;
-  font-family: sans-serif;
+  font-family: "Audiowide", sans-serif;
+  color: white;
   margin: 20px 0px;
+  text-shadow: 2px 2px cyan;
 }
 
 #game-canvas {
   margin: auto;
   display: block;
-  border: 1px solid black;
+  border: 3px solid cyan;
+  /*box-shadow: 10px 10px 5px white;*/
 }

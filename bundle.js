@@ -118,7 +118,8 @@ var Game = function () {
     value: function bindKeyHandlers() {
       var bike = this.bikes[0];
       Object.keys(Game.MOVES).forEach(function (k) {
-        key(k, function () {
+        key(k, function (e) {
+          e.preventDefault();
           bike.move(Game.MOVES[k]);
         });
       });
@@ -188,7 +189,7 @@ var Bike = function () {
     this.velocity = [Bike.SPEED, 0];
     this.width = 40;
     this.height = 20;
-    this.color = "#FF0000";
+    this.color = "#00FF00";
   }
 
   _createClass(Bike, [{
