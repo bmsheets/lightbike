@@ -100,6 +100,10 @@ var _bike = __webpack_require__(2);
 
 var _bike2 = _interopRequireDefault(_bike);
 
+var _explosion = __webpack_require__(4);
+
+var _explosion2 = _interopRequireDefault(_explosion);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -110,11 +114,12 @@ var Game = function () {
 
     this.ctx = ctx;
     this.bikes = [new _bike2.default()];
+    this.explosions = [new _explosion2.default()];
     this.players = [];
   }
 
   _createClass(Game, [{
-    key: "bindKeyHandlers",
+    key: 'bindKeyHandlers',
     value: function bindKeyHandlers() {
       var bike = this.bikes[0];
       Object.keys(Game.MOVES).forEach(function (k) {
@@ -125,13 +130,13 @@ var Game = function () {
       });
     }
   }, {
-    key: "run",
+    key: 'run',
     value: function run() {
       this.bindKeyHandlers();
       this.render();
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
       var _this = this;
 
@@ -140,6 +145,9 @@ var Game = function () {
       this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
       this.bikes.forEach(function (bike) {
         return bike.render(_this.ctx);
+      });
+      this.explosions.forEach(function (explosion) {
+        return explosion.render(_this.ctx);
       });
       requestAnimationFrame(this.render.bind(this));
     }
@@ -194,11 +202,11 @@ var Bike = function () {
     this.y = 75;
     this.prevX = 100;
     this.prevY = 75;
-    this.color = "blue";
+    this.color = "yellow";
     this.direction = "E";
     this.velocity = [Bike.SPEED, 0];
     this.img = new Image();
-    this.img.src = "spritesheet_vehicles.png";
+    this.img.src = "assets/spritesheet_vehicles.png";
     this.wall = new _wall2.default(this);
     this.wall.addVertex(this.centerCoords());
   }
@@ -343,6 +351,70 @@ var Wall = function () {
 }();
 
 exports.default = Wall;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Explosion = function () {
+  function Explosion() {
+    _classCallCheck(this, Explosion);
+
+    this.x = 500;
+    this.y = 375;
+    this.frame = 1;
+    this.ticks = 0;
+    this.ticksPerFrame = 8;
+    this.img = new Image();
+    this.img.src = "assets/tanks_spritesheetDefault.png";
+  }
+
+  _createClass(Explosion, [{
+    key: "render",
+    value: function render(ctx) {
+      if (this.frame > 12) {
+        return;
+      }
+      var sprite = Explosion.SPRITE[this.frame];
+      ctx.drawImage(this.img, sprite.x, sprite.y, sprite.width, sprite.height, this.x - sprite.width / 2, this.y - sprite.height / 2, sprite.width, sprite.height);
+      this.ticks += 1;
+      if (this.ticks > this.ticksPerFrame) {
+        this.ticks = 0;
+        this.frame += 1;
+      }
+    }
+  }]);
+
+  return Explosion;
+}();
+
+Explosion.SPRITE = {
+  1: { x: 424, y: 122, width: 64, height: 64 },
+  2: { x: 498, y: 447, width: 41, height: 41 },
+  3: { x: 425, y: 188, width: 60, height: 60 },
+  4: { x: 422, y: 379, width: 74, height: 74 },
+  5: { x: 550, y: 284, width: 14, height: 14 },
+  6: { x: 542, y: 84, width: 33, height: 33 },
+  7: { x: 539, y: 41, width: 41, height: 41 },
+  8: { x: 425, y: 250, width: 59, height: 60 },
+  9: { x: 425, y: 0, width: 59, height: 60 },
+  10: { x: 543, y: 268, width: 14, height: 14 },
+  11: { x: 541, y: 475, width: 33, height: 33 },
+  12: { x: 539, y: 207, width: 41, height: 41 }
+};
+
+exports.default = Explosion;
 
 /***/ })
 /******/ ]);
