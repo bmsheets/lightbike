@@ -114,7 +114,7 @@ var Game = function () {
   }
 
   _createClass(Game, [{
-    key: 'bindKeyHandlers',
+    key: "bindKeyHandlers",
     value: function bindKeyHandlers() {
       var bike = this.bikes[0];
       Object.keys(Game.MOVES).forEach(function (k) {
@@ -124,17 +124,19 @@ var Game = function () {
       });
     }
   }, {
-    key: 'run',
+    key: "run",
     value: function run() {
       this.bindKeyHandlers();
       this.render();
     }
   }, {
-    key: 'render',
+    key: "render",
     value: function render() {
       var _this = this;
 
-      this.ctx.clearRect(0, 0, Game.width, Game.height);
+      this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
+      this.ctx.fillStyle = Game.BG_COLOR;
+      this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
       this.bikes.forEach(function (bike) {
         return bike.render(_this.ctx);
       });
@@ -156,8 +158,9 @@ Game.MOVES = {
   right: [1, 0]
 };
 
-Game.width = 800;
-Game.height = 600;
+Game.WIDTH = 800;
+Game.HEIGHT = 600;
+Game.BG_COLOR = "#333333";
 
 exports.default = Game;
 
@@ -191,6 +194,8 @@ var Bike = function () {
   _createClass(Bike, [{
     key: "move",
     value: function move(vector) {
+      this.width = vector[0] ? 40 : 20;
+      this.height = vector[1] ? 40 : 20;
       this.velocity[0] = vector[0] * Bike.SPEED;
       this.velocity[1] = vector[1] * Bike.SPEED;
     }
