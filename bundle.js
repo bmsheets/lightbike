@@ -148,19 +148,30 @@ var Game = function () {
   return Game;
 }();
 
+// Game.MOVES = {
+//   w: [0, -1],
+//   a: [-1, 0],
+//   s: [0, 1],
+//   d: [1, 0],
+//   up: [0, -1],
+//   left: [-1, 0],
+//   down: [0, 1],
+//   right: [1, 0]
+// };
+
 Game.MOVES = {
-  w: [0, -1],
-  a: [-1, 0],
-  s: [0, 1],
-  d: [1, 0],
-  up: [0, -1],
-  left: [-1, 0],
-  down: [0, 1],
-  right: [1, 0]
+  w: "N",
+  a: "W",
+  s: "S",
+  d: "E",
+  up: "N",
+  left: "W",
+  down: "S",
+  right: "E"
 };
 
-Game.WIDTH = 800;
-Game.HEIGHT = 600;
+Game.WIDTH = 1000;
+Game.HEIGHT = 750;
 Game.BG_COLOR = "#333333";
 
 exports.default = Game;
@@ -185,30 +196,30 @@ var Bike = function () {
     _classCallCheck(this, Bike);
 
     this.x = 100;
-    this.y = 100;
+    this.y = 75;
+    this.direction = "E";
     this.velocity = [Bike.SPEED, 0];
     this.img = new Image();
     this.img.src = "spritesheet_vehicles.png";
-    this.direction = "E";
   }
 
   _createClass(Bike, [{
     key: "move",
-    value: function move(vector) {
-      this.velocity[0] = vector[0] * Bike.SPEED;
-      this.velocity[1] = vector[1] * Bike.SPEED;
-      if (vector[0]) {
-        if (vector[0] > 0) {
-          this.direction = "E";
-        } else {
-          this.direction = "W";
-        }
-      } else {
-        if (vector[1] > 0) {
-          this.direction = "S";
-        } else {
-          this.direction = "N";
-        }
+    value: function move(direction) {
+      this.direction = direction;
+      switch (direction) {
+        case "N":
+          this.velocity = [0, -Bike.SPEED];
+          break;
+        case "W":
+          this.velocity = [-Bike.SPEED, 0];
+          break;
+        case "S":
+          this.velocity = [0, Bike.SPEED];
+          break;
+        case "E":
+          this.velocity = [Bike.SPEED, 0];
+          break;
       }
     }
   }, {
@@ -216,15 +227,16 @@ var Bike = function () {
     value: function updatePos() {
       this.x += this.velocity[0];
       this.y += this.velocity[1];
-      if (this.x < 0) {
-        this.x += 800;
+      // Temporary wrap around level
+      if (this.x < -50) {
+        this.x += 1000;
       } else {
-        this.x %= 800;
+        this.x %= 1000;
       }
-      if (this.y < 0) {
-        this.y += 600;
+      if (this.y < -50) {
+        this.y += 750;
       } else {
-        this.y %= 600;
+        this.y %= 750;
       }
     }
   }, {
@@ -235,7 +247,7 @@ var Bike = function () {
       ctx.translate(this.x + Bike.WIDTH / 2, this.y + Bike.LENGTH / 2);
       ctx.rotate(this.rotationCoefficient() * Math.PI / 2);
       ctx.translate(-(this.x + Bike.WIDTH / 2), -(this.y + Bike.LENGTH / 2));
-      ctx.drawImage(this.img, 480, 389, 44, 100, this.x, this.y, Bike.WIDTH, Bike.LENGTH);
+      ctx.drawImage(this.img, 506, 133, 44, 100, this.x, this.y, Bike.WIDTH, Bike.LENGTH);
       ctx.restore();
     }
   }, {
