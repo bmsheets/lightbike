@@ -136,7 +136,7 @@ var Game = function () {
       var _this = this;
 
       this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
-      this.ctx.fillStyle = Game.BG_COLOR;
+      this.ctx.fillStyle = Game.BACKGROUND_COLOR;
       this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
       this.bikes.forEach(function (bike) {
         return bike.render(_this.ctx);
@@ -147,17 +147,6 @@ var Game = function () {
 
   return Game;
 }();
-
-// Game.MOVES = {
-//   w: [0, -1],
-//   a: [-1, 0],
-//   s: [0, 1],
-//   d: [1, 0],
-//   up: [0, -1],
-//   left: [-1, 0],
-//   down: [0, 1],
-//   right: [1, 0]
-// };
 
 Game.MOVES = {
   w: "N",
@@ -172,7 +161,7 @@ Game.MOVES = {
 
 Game.WIDTH = 1000;
 Game.HEIGHT = 750;
-Game.BG_COLOR = "#333333";
+Game.BACKGROUND_COLOR = "#333333";
 
 exports.default = Game;
 
@@ -197,6 +186,7 @@ var Bike = function () {
 
     this.x = 100;
     this.y = 75;
+    this.color = "blue";
     this.direction = "E";
     this.velocity = [Bike.SPEED, 0];
     this.img = new Image();
@@ -247,7 +237,7 @@ var Bike = function () {
       ctx.translate(this.x + Bike.WIDTH / 2, this.y + Bike.LENGTH / 2);
       ctx.rotate(this.rotationCoefficient() * Math.PI / 2);
       ctx.translate(-(this.x + Bike.WIDTH / 2), -(this.y + Bike.LENGTH / 2));
-      ctx.drawImage(this.img, 506, 133, 44, 100, this.x, this.y, Bike.WIDTH, Bike.LENGTH);
+      ctx.drawImage(this.img, Bike.SPRITE_COORDS[this.color].x, Bike.SPRITE_COORDS[this.color].y, Bike.SPRITE_WIDTH, Bike.SPRITE_LENGTH, this.x, this.y, Bike.WIDTH, Bike.LENGTH);
       ctx.restore();
     }
   }, {
@@ -260,10 +250,21 @@ var Bike = function () {
   return Bike;
 }();
 
+// Constants and pixel values
+
+
 Bike.SPEED = 5;
 Bike.LENGTH = 50;
 Bike.WIDTH = 22;
 Bike.DIRECTIONS = ["N", "E", "S", "W"];
+Bike.SPRITE_LENGTH = 100;
+Bike.SPRITE_WIDTH = 44;
+Bike.SPRITE_COORDS = {
+  red: { x: 290, y: 399 },
+  blue: { x: 506, y: 133 },
+  green: { x: 480, y: 389 },
+  yellow: { x: 219, y: 133 }
+};
 
 exports.default = Bike;
 
