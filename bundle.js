@@ -114,8 +114,10 @@ var Game = function () {
 
     this.ctx = ctx;
     this.bikes = [new _bike2.default()];
+    this.walls = this.bikes.map(function (bike) {
+      return bike.wall;
+    });
     this.explosions = [];
-    this.players = [];
   }
 
   _createClass(Game, [{
@@ -145,16 +147,24 @@ var Game = function () {
   }, {
     key: 'checkWallCollisions',
     value: function checkWallCollisions() {
-      var walls = [];
+      var _this2 = this;
+
       this.bikes.forEach(function (bike, idx) {
-        walls.push(bike.wall);
+        _this2.walls.forEach(function (wall) {
+          console.log(bike.wallCollision(wall));
+          if (bike.wallCollision(wall)) {
+            console.log("wall collision detected");
+            _this2.explosions.push(new _explosion2.default(bike.centerCoords()));
+            _this2.bikes.splice(idx, 1);
+          }
+        });
       });
     }
   }, {
     key: 'checkCollisions',
     value: function checkCollisions() {
       this.checkBoundaryCollisions();
-      // this.checkWallCollisions();
+      this.checkWallCollisions();
     }
   }, {
     key: 'run',
@@ -165,15 +175,16 @@ var Game = function () {
   }, {
     key: 'allObjects',
     value: function allObjects() {
+      // bikes render their own walls
       return this.bikes.concat(this.explosions);
     }
   }, {
     key: 'renderAllObjects',
     value: function renderAllObjects() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.allObjects().forEach(function (object) {
-        return object.render(_this2.ctx);
+        return object.render(_this3.ctx);
       });
     }
   }, {
@@ -242,13 +253,14 @@ var Bike = function () {
     this.y = 75;
     this.prevX = 100;
     this.prevY = 75;
-    this.color = "yellow";
+    this.color = "blue";
     this.direction = "E";
     this.velocity = [Bike.SPEED, 0];
     this.img = new Image();
     this.img.src = "assets/spritesheet_vehicles.png";
     this.wall = new _wall2.default(this);
     this.wall.addVertex(this.centerCoords());
+    this.wallCollision = this.wallCollision.bind(this);
   }
 
   _createClass(Bike, [{
@@ -293,17 +305,6 @@ var Bike = function () {
       this.prevY = this.y;
       this.x += this.velocity[0];
       this.y += this.velocity[1];
-      // Temporary wrap around level
-      if (this.x < -50) {
-        this.x += 1000;
-      } else {
-        this.x %= 1000;
-      }
-      if (this.y < -50) {
-        this.y += 750;
-      } else {
-        this.y %= 750;
-      }
     }
   }, {
     key: "boundaryCollision",
@@ -315,11 +316,52 @@ var Bike = function () {
     }
   }, {
     key: "wallCollision",
-    value: function wallCollision(wall) {}
+    value: function wallCollision(wall) {
+      var vertices = wall.vertices;
+      for (var i = 1; i < vertices.length; i++) {
+        if (this.betweenVertices(vertices[i - 1], vertices[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
   }, {
-    key: "destroy",
-    value: function destroy() {
-      var explosion = new Explosion();
+    key: "betweenVertices",
+    value: function betweenVertices(v1, v2) {
+      var frontPosition = this.centerCoords();
+      switch (this.direction) {
+        case "N":
+          frontPosition[1] -= 25;
+          break;
+        case "W":
+          frontPosition[0] -= 25;
+          break;
+        case "S":
+          frontPosition[1] += 25;
+          break;
+        case "E":
+          frontPosition[0] += 25;
+          break;
+      }
+
+      if (v1[0] === v2[0]) {
+        // vertical line
+        // console.log("comparing front pos to vertical line: ", frontPosition, v1);
+        if (frontPosition[1] > v1[1] - 2 && frontPosition[1] < v1[1] + 2) {
+          // front of bike is within line
+          // console.log("vertical line collision");
+          return true;
+        }
+      } else if (v1[1] === v2[1]) {
+        // horizontal line
+        if (frontPosition[0] > v1[0] - 2 && frontPosition[0] < v1[0] + 2) {
+          // front of bike is within line
+          return true;
+        }
+      } else {
+        console.error("Verticies are not adjacent!");
+      }
+      return false;
     }
   }, {
     key: "render",
@@ -394,7 +436,7 @@ var Wall = function () {
   _createClass(Wall, [{
     key: "render",
     value: function render(ctx) {
-      ctx.lineWidth = 5;
+      ctx.lineWidth = Wall.WIDTH;
       ctx.beginPath();
       this.vertices.forEach(function (vertex, idx) {
         if (idx === 0) {
@@ -417,6 +459,8 @@ var Wall = function () {
 
   return Wall;
 }();
+
+Wall.WIDTH = 5;
 
 exports.default = Wall;
 
@@ -443,7 +487,7 @@ var Explosion = function () {
     this.y = coords[1];
     this.frame = 1;
     this.ticks = 0;
-    this.ticksPerFrame = 8;
+    this.ticksPerFrame = 6;
     this.img = new Image();
     this.img.src = "assets/tanks_spritesheetDefault.png";
   }
