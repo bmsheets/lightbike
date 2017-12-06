@@ -151,7 +151,6 @@ var Game = function () {
 
       this.bikes.forEach(function (bike, idx) {
         _this2.walls.forEach(function (wall) {
-          console.log(bike.wallCollision(wall));
           if (bike.wallCollision(wall)) {
             console.log("wall collision detected");
             _this2.explosions.push(new _explosion2.default(bike.centerCoords()));
@@ -193,6 +192,19 @@ var Game = function () {
       this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
       this.ctx.fillStyle = Game.BACKGROUND_COLOR;
       this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
+
+      this.ctx.lineWidth = 0.5;
+      this.ctx.beginPath();
+      for (var i = 0; i < Game.WIDTH; i += 40) {
+        this.ctx.moveTo(i, 0);
+        this.ctx.lineTo(i, Game.HEIGHT);
+      }
+      for (var j = 0; j < Game.HEIGHT; j += 40) {
+        this.ctx.moveTo(0, j);
+        this.ctx.lineTo(Game.WIDTH, j);
+      }
+      this.ctx.strokeStyle = "darkviolet";
+      this.ctx.stroke();
     }
   }, {
     key: 'render',
@@ -346,16 +358,20 @@ var Bike = function () {
 
       if (v1[0] === v2[0]) {
         // vertical line
-        // console.log("comparing front pos to vertical line: ", frontPosition, v1);
-        if (frontPosition[1] > v1[1] - 2 && frontPosition[1] < v1[1] + 2) {
+        var coplanar = frontPosition[0] > v1[0] - 2 && frontPosition[0] < v1[0] + 2;
+        var aligned = frontPosition[1] > Math.min(v1[1], v2[1]) && frontPosition[1] < Math.max(v1[1], v2[1]);
+        if (coplanar && aligned) {
           // front of bike is within line
-          // console.log("vertical line collision");
+          console.log("vertical line collision between front position:", frontPosition, " and vertices: ", v1, v2);
           return true;
         }
       } else if (v1[1] === v2[1]) {
         // horizontal line
-        if (frontPosition[0] > v1[0] - 2 && frontPosition[0] < v1[0] + 2) {
+        var _coplanar = frontPosition[1] > v1[1] - 2 && frontPosition[1] < v1[1] + 2;
+        var _aligned = frontPosition[0] > Math.min(v1[0], v2[0]) && frontPosition[0] < Math.max(v1[0], v2[0]);
+        if (_coplanar && _aligned) {
           // front of bike is within line
+          console.log("horizontal line collision between front position:", frontPosition, " and vertices: ", v1, v2);
           return true;
         }
       } else {
