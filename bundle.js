@@ -113,21 +113,32 @@ var Game = function () {
     _classCallCheck(this, Game);
 
     this.ctx = ctx;
-    this.bikes = [new _bike2.default()];
+    this.bikes = [new _bike2.default(100, 75, "blue", "E"), new _bike2.default(100, 300, "red", "E")];
     this.walls = this.bikes.map(function (bike) {
       return bike.wall;
     });
     this.explosions = [];
+    this.discoMode = true;
+    this.frameCount = 0;
+    this.style = "darkviolet";
   }
 
   _createClass(Game, [{
     key: 'bindKeyHandlers',
     value: function bindKeyHandlers() {
-      var bike = this.bikes[0];
-      Object.keys(Game.MOVES).forEach(function (k) {
+      var player1 = this.bikes[0];
+      var player2 = this.bikes[1];
+      Object.keys(Game.PLAYER1_KEYS).forEach(function (k) {
         key(k, function (e) {
           e.preventDefault();
-          bike.move(Game.MOVES[k]);
+          player1.move(Game.PLAYER1_KEYS[k]);
+        });
+      });
+
+      Object.keys(Game.PLAYER2_KEYS).forEach(function (k) {
+        key(k, function (e) {
+          e.preventDefault();
+          player2.move(Game.PLAYER2_KEYS[k]);
         });
       });
     }
@@ -141,6 +152,9 @@ var Game = function () {
           console.log("boundary collision detected");
           _this.explosions.push(new _explosion2.default(bike.centerCoords()));
           _this.bikes.splice(idx, 1);
+          _this.walls = _this.bikes.map(function (bike) {
+            return bike.wall;
+          });
         }
       });
     }
@@ -155,6 +169,9 @@ var Game = function () {
             console.log("wall collision detected");
             _this2.explosions.push(new _explosion2.default(bike.centerCoords()));
             _this2.bikes.splice(idx, 1);
+            _this2.walls = _this2.bikes.map(function (bike) {
+              return bike.wall;
+            });
           }
         });
       });
@@ -189,6 +206,7 @@ var Game = function () {
   }, {
     key: 'resetCanvas',
     value: function resetCanvas() {
+      var discoLimit = 100 * Math.random();
       this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
       this.ctx.fillStyle = Game.BACKGROUND_COLOR;
       this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
@@ -203,8 +221,18 @@ var Game = function () {
         this.ctx.moveTo(0, j);
         this.ctx.lineTo(Game.WIDTH, j);
       }
-      this.ctx.strokeStyle = "darkviolet";
+      if (this.discoMode && this.frameCount > discoLimit) {
+        this.style = this.discoColor();
+        this.frameCount = 0;
+      }
+      this.frameCount++;
+      this.ctx.strokeStyle = this.style;
       this.ctx.stroke();
+    }
+  }, {
+    key: 'discoColor',
+    value: function discoColor() {
+      return Game.DISCO_COLORS[Math.floor(Math.random() * Game.DISCO_COLORS.length)];
     }
   }, {
     key: 'render',
@@ -219,20 +247,25 @@ var Game = function () {
   return Game;
 }();
 
-Game.MOVES = {
-  w: "N",
-  a: "W",
-  s: "S",
-  d: "E",
+Game.PLAYER1_KEYS = {
   up: "N",
   left: "W",
   down: "S",
   right: "E"
 };
 
+Game.PLAYER2_KEYS = {
+  w: "N",
+  a: "W",
+  s: "S",
+  d: "E"
+};
+
 Game.WIDTH = 1000;
 Game.HEIGHT = 750;
 Game.BACKGROUND_COLOR = "#333333";
+Game.GRID_COLOR = "darkviolet";
+Game.DISCO_COLORS = ["blue", "cyan", "fuchsia", "lime", "yellow", "crimson"];
 
 exports.default = Game;
 
@@ -258,15 +291,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Bike = function () {
-  function Bike() {
+  function Bike(x, y, color, direction) {
     _classCallCheck(this, Bike);
 
-    this.x = 100;
-    this.y = 75;
-    this.prevX = 100;
-    this.prevY = 75;
-    this.color = "blue";
-    this.direction = "E";
+    this.x = x;
+    this.y = y;
+    this.prevX = x;
+    this.prevY = y;
+    this.color = color;
+    this.direction = direction;
     this.velocity = [Bike.SPEED, 0];
     this.img = new Image();
     this.img.src = "assets/spritesheet_vehicles.png";
