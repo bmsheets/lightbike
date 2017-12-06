@@ -114,7 +114,7 @@ var Game = function () {
 
     this.ctx = ctx;
     this.bikes = [new _bike2.default()];
-    this.explosions = [new _explosion2.default()];
+    this.explosions = [];
     this.players = [];
   }
 
@@ -130,25 +130,65 @@ var Game = function () {
       });
     }
   }, {
+    key: 'checkBoundaryCollisions',
+    value: function checkBoundaryCollisions() {
+      var _this = this;
+
+      this.bikes.forEach(function (bike, idx) {
+        if (bike.boundaryCollision()) {
+          console.log("boundary collision detected");
+          _this.explosions.push(new _explosion2.default(bike.centerCoords()));
+          _this.bikes.splice(idx, 1);
+        }
+      });
+    }
+  }, {
+    key: 'checkWallCollisions',
+    value: function checkWallCollisions() {
+      var walls = [];
+      this.bikes.forEach(function (bike, idx) {
+        walls.push(bike.wall);
+      });
+    }
+  }, {
+    key: 'checkCollisions',
+    value: function checkCollisions() {
+      this.checkBoundaryCollisions();
+      // this.checkWallCollisions();
+    }
+  }, {
     key: 'run',
     value: function run() {
       this.bindKeyHandlers();
       this.render();
     }
   }, {
-    key: 'render',
-    value: function render() {
-      var _this = this;
+    key: 'allObjects',
+    value: function allObjects() {
+      return this.bikes.concat(this.explosions);
+    }
+  }, {
+    key: 'renderAllObjects',
+    value: function renderAllObjects() {
+      var _this2 = this;
 
+      this.allObjects().forEach(function (object) {
+        return object.render(_this2.ctx);
+      });
+    }
+  }, {
+    key: 'resetCanvas',
+    value: function resetCanvas() {
       this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
       this.ctx.fillStyle = Game.BACKGROUND_COLOR;
       this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
-      this.bikes.forEach(function (bike) {
-        return bike.render(_this.ctx);
-      });
-      this.explosions.forEach(function (explosion) {
-        return explosion.render(_this.ctx);
-      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      this.resetCanvas();
+      this.checkCollisions();
+      this.renderAllObjects();
       requestAnimationFrame(this.render.bind(this));
     }
   }]);
@@ -217,22 +257,34 @@ var Bike = function () {
       if (direction === this.direction) {
         return;
       }
-      this.direction = direction;
-      this.wall.addVertex(this.centerCoords());
       switch (direction) {
         case "N":
+          if (this.direction === "S") {
+            return;
+          }
           this.velocity = [0, -Bike.SPEED];
           break;
         case "W":
+          if (this.direction === "E") {
+            return;
+          }
           this.velocity = [-Bike.SPEED, 0];
           break;
         case "S":
+          if (this.direction === "N") {
+            return;
+          }
           this.velocity = [0, Bike.SPEED];
           break;
         case "E":
+          if (this.direction === "W") {
+            return;
+          }
           this.velocity = [Bike.SPEED, 0];
           break;
       }
+      this.direction = direction;
+      this.wall.addVertex(this.centerCoords());
     }
   }, {
     key: "updatePos",
@@ -252,6 +304,22 @@ var Bike = function () {
       } else {
         this.y %= 750;
       }
+    }
+  }, {
+    key: "boundaryCollision",
+    value: function boundaryCollision() {
+      if (this.x < 20 || this.x > 960 || this.y < 0 || this.y > 700) {
+        return true;
+      }
+      return false;
+    }
+  }, {
+    key: "wallCollision",
+    value: function wallCollision(wall) {}
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      var explosion = new Explosion();
     }
   }, {
     key: "render",
@@ -368,11 +436,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Explosion = function () {
-  function Explosion() {
+  function Explosion(coords) {
     _classCallCheck(this, Explosion);
 
-    this.x = 500;
-    this.y = 375;
+    this.x = coords[0];
+    this.y = coords[1];
     this.frame = 1;
     this.ticks = 0;
     this.ticksPerFrame = 8;

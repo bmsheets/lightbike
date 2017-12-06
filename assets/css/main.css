@@ -7,11 +7,13 @@
 
 body {
   background-color: black;
+  background-image: url("https://static.pexels.com/photos/110854/pexels-photo-110854.jpeg");
+  background-size: cover;
 }
 
 h1 {
   text-align: center;
-  font-size: 36px;
+  font-size: 48px;
   font-family: "Audiowide", sans-serif;
   color: white;
   margin: 20px 0px;
