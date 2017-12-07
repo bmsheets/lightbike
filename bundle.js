@@ -120,7 +120,7 @@ var Game = function () {
     this.explosions = [];
     this.discoMode = true;
     this.frameCount = 0;
-    this.style = "darkviolet";
+    this.style = Game.GRID_COLOR;
   }
 
   _createClass(Game, [{
@@ -350,6 +350,11 @@ var Bike = function () {
       this.prevY = this.y;
       this.x += this.velocity[0];
       this.y += this.velocity[1];
+      // add last vertex
+      // if (this.wall.vertices.length > 1) {
+      //   this.wall.vertices.pop();
+      // }
+      // this.wall.addVertex(this.centerCoords());
     }
   }, {
     key: "boundaryCollision",
@@ -367,6 +372,11 @@ var Bike = function () {
         if (this.betweenVertices(vertices[i - 1], vertices[i])) {
           return true;
         }
+      }
+      console.log("vertices: ", vertices);
+      console.log("lastVertex: ", wall.lastVertex);
+      if (this.wall !== wall && this.betweenVertices(vertices[vertices.length - 1], wall.lastVertex)) {
+        return true;
       }
       return false;
     }
@@ -394,7 +404,6 @@ var Bike = function () {
         var coplanar = frontPosition[0] > v1[0] - 2 && frontPosition[0] < v1[0] + 2;
         var aligned = frontPosition[1] > Math.min(v1[1], v2[1]) && frontPosition[1] < Math.max(v1[1], v2[1]);
         if (coplanar && aligned) {
-          // front of bike is within line
           console.log("vertical line collision between front position:", frontPosition, " and vertices: ", v1, v2);
           return true;
         }
@@ -403,7 +412,6 @@ var Bike = function () {
         var _coplanar = frontPosition[1] > v1[1] - 2 && frontPosition[1] < v1[1] + 2;
         var _aligned = frontPosition[0] > Math.min(v1[0], v2[0]) && frontPosition[0] < Math.max(v1[0], v2[0]);
         if (_coplanar && _aligned) {
-          // front of bike is within line
           console.log("horizontal line collision between front position:", frontPosition, " and vertices: ", v1, v2);
           return true;
         }
@@ -480,6 +488,7 @@ var Wall = function () {
     this.bike = bike;
     this.color = bike.color;
     this.vertices = [];
+    this.lastVertex = bike.centerCoords();
   }
 
   _createClass(Wall, [{
@@ -494,8 +503,8 @@ var Wall = function () {
           ctx.lineTo(vertex[0], vertex[1]);
         }
       });
-      var lastVertex = this.bike.centerCoords();
-      ctx.lineTo(lastVertex[0], lastVertex[1]);
+      this.lastVertex = this.bike.centerCoords();
+      ctx.lineTo(this.lastVertex[0], this.lastVertex[1]);
       ctx.strokeStyle = this.color;
       ctx.stroke();
     }
