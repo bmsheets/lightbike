@@ -117,12 +117,12 @@ var Game = function () {
     _classCallCheck(this, Game);
 
     this.ctx = ctx;
-    this.bikes = [new _bike2.default(100, 75, "blue", "E"), new _bike2.default(100, 300, "red", "E")];
+    this.bikes = [new _bike2.default(200, 150, "blue", "E"), new _bike2.default(800, 150, "red", "S"), new _bike2.default(800, 600, "yellow", "W"), new _bike2.default(200, 600, "green", "N")];
     this.walls = this.bikes.map(function (bike) {
       return bike.wall;
     });
     this.explosions = [];
-    this.bots = [new _bot2.default(this.bikes[1])];
+    this.bots = [new _bot2.default(this.bikes[1]), new _bot2.default(this.bikes[2]), new _bot2.default(this.bikes[3])];
     this.discoMode = true;
     this.frameCount = 0;
     this.style = Game.GRID_COLOR;
@@ -316,7 +316,7 @@ var Bike = function () {
     this.prevY = y;
     this.color = color;
     this.direction = direction;
-    this.velocity = [Bike.SPEED, 0];
+    this.velocity = this.getVelocity();
     this.img = new Image();
     this.img.src = "assets/spritesheet_vehicles.png";
     this.wall = new _wall2.default(this);
@@ -358,6 +358,20 @@ var Bike = function () {
       }
       this.direction = direction;
       this.wall.addVertex(this.centerCoords());
+    }
+  }, {
+    key: "getVelocity",
+    value: function getVelocity() {
+      switch (this.direction) {
+        case "N":
+          return [0, -Bike.SPEED];
+        case "W":
+          return [-Bike.SPEED, 0];
+        case "S":
+          return [0, Bike.SPEED];
+        case "E":
+          return [Bike.SPEED, 0];
+      }
     }
   }, {
     key: "updatePos",
