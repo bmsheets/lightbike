@@ -25,3 +25,19 @@ h1 {
   display: block;
   border: 3px solid cyan;
 }
+
+#linkedin-icon {
+  width: 68px;
+  background-image: url("../linkedin.png");
+}
+
+#github-icon {
+  width: 64px;
+  background-image: url("../github.png");
+}
+
+#linkedin-icon, #github-icon {
+  height: 64px;
+  display: inline-block;
+  margin-left: 20px;
+}
