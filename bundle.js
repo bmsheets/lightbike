@@ -60,233 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _game = __webpack_require__(1);
-
-var _game2 = _interopRequireDefault(_game);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-document.addEventListener('DOMContentLoaded', function () {
-  var canvas = document.getElementById("game-canvas");
-  var ctx = canvas.getContext("2d");
-  var game = new _game2.default(ctx);
-  game.run();
-});
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _bike = __webpack_require__(2);
-
-var _bike2 = _interopRequireDefault(_bike);
-
-var _explosion = __webpack_require__(4);
-
-var _explosion2 = _interopRequireDefault(_explosion);
-
-var _bot = __webpack_require__(5);
-
-var _bot2 = _interopRequireDefault(_bot);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Game = function () {
-  function Game(ctx) {
-    _classCallCheck(this, Game);
-
-    this.ctx = ctx;
-    this.bikes = [new _bike2.default(200, 150, "blue", "E"), new _bike2.default(800, 150, "red", "S"), new _bike2.default(800, 600, "yellow", "W"), new _bike2.default(200, 600, "green", "N")];
-    this.walls = this.bikes.map(function (bike) {
-      return bike.wall;
-    });
-    this.explosions = [];
-    this.bots = [new _bot2.default(this.bikes[1]), new _bot2.default(this.bikes[2]), new _bot2.default(this.bikes[3])];
-    this.discoMode = true;
-    this.frameCount = 0;
-    this.style = Game.GRID_COLOR;
-  }
-
-  _createClass(Game, [{
-    key: 'bindKeyHandlers',
-    value: function bindKeyHandlers() {
-      var player1 = this.bikes[0];
-      // const player2 = this.bikes[1];
-      Object.keys(Game.PLAYER1_KEYS).forEach(function (k) {
-        key(k, function (e) {
-          e.preventDefault();
-          player1.move(Game.PLAYER1_KEYS[k]);
-        });
-      });
-
-      //   Object.keys(Game.PLAYER2_KEYS).forEach(k => {
-      //     key(k, (e) => {
-      //       e.preventDefault();
-      //       player2.move(Game.PLAYER2_KEYS[k]);
-      //     });
-      //   });
-    }
-  }, {
-    key: 'checkBoundaryCollisions',
-    value: function checkBoundaryCollisions() {
-      var _this = this;
-
-      this.bikes.forEach(function (bike, idx) {
-        if (bike.boundaryCollision()) {
-          // console.log("boundary collision detected");
-          _this.explosions.push(new _explosion2.default(bike.centerCoords()));
-          _this.bikes.splice(idx, 1);
-          _this.updateWalls();
-        }
-      });
-    }
-  }, {
-    key: 'checkWallCollisions',
-    value: function checkWallCollisions() {
-      var _this2 = this;
-
-      this.bikes.forEach(function (bike, idx) {
-        _this2.walls.forEach(function (wall) {
-          if (bike.wallCollision(wall)) {
-            // console.log("wall collision detected");
-            _this2.explosions.push(new _explosion2.default(bike.centerCoords()));
-            _this2.bikes.splice(idx, 1);
-            _this2.updateWalls();
-          }
-        });
-      });
-    }
-  }, {
-    key: 'updateWalls',
-    value: function updateWalls() {
-      this.walls = this.bikes.map(function (bike) {
-        return bike.wall;
-      });
-    }
-  }, {
-    key: 'checkCollisions',
-    value: function checkCollisions() {
-      this.checkBoundaryCollisions();
-      this.checkWallCollisions();
-    }
-  }, {
-    key: 'moveBots',
-    value: function moveBots() {
-      this.bots.forEach(function (bot) {
-        bot.avoidObstacles();
-      });
-    }
-  }, {
-    key: 'run',
-    value: function run() {
-      this.bindKeyHandlers();
-      this.render();
-    }
-  }, {
-    key: 'allObjects',
-    value: function allObjects() {
-      // bikes render their own walls
-      return this.bikes.concat(this.explosions);
-    }
-  }, {
-    key: 'renderAllObjects',
-    value: function renderAllObjects() {
-      var _this3 = this;
-
-      this.allObjects().forEach(function (object) {
-        return object.render(_this3.ctx);
-      });
-    }
-  }, {
-    key: 'resetCanvas',
-    value: function resetCanvas() {
-      var discoLimit = 100 * Math.random();
-      this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
-      this.ctx.fillStyle = Game.BACKGROUND_COLOR;
-      this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
-
-      this.ctx.lineWidth = 0.5;
-      this.ctx.beginPath();
-      for (var i = 0; i < Game.WIDTH; i += 40) {
-        this.ctx.moveTo(i, 0);
-        this.ctx.lineTo(i, Game.HEIGHT);
-      }
-      for (var j = 0; j < Game.HEIGHT; j += 40) {
-        this.ctx.moveTo(0, j);
-        this.ctx.lineTo(Game.WIDTH, j);
-      }
-      if (this.discoMode && this.frameCount > discoLimit) {
-        this.style = this.discoColor();
-        this.frameCount = 0;
-      }
-      this.frameCount++;
-      this.ctx.strokeStyle = this.style;
-      this.ctx.stroke();
-    }
-  }, {
-    key: 'discoColor',
-    value: function discoColor() {
-      return Game.DISCO_COLORS[Math.floor(Math.random() * Game.DISCO_COLORS.length)];
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      this.resetCanvas();
-      this.moveBots();
-      this.checkCollisions();
-      this.renderAllObjects();
-      requestAnimationFrame(this.render.bind(this));
-    }
-  }]);
-
-  return Game;
-}();
-
-Game.PLAYER1_KEYS = {
-  up: "N",
-  left: "W",
-  down: "S",
-  right: "E"
-};
-
-Game.PLAYER2_KEYS = {
-  w: "N",
-  a: "W",
-  s: "S",
-  d: "E"
-};
-
-Game.WIDTH = 1000;
-Game.HEIGHT = 750;
-Game.BACKGROUND_COLOR = "#333333";
-Game.GRID_COLOR = "darkviolet";
-Game.DISCO_COLORS = ["blue", "cyan", "fuchsia", "lime", "yellow", "crimson"];
-
-exports.default = Game;
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -490,6 +268,235 @@ Bike.SPRITE_COORDS = {
 exports.default = Bike;
 
 /***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _game = __webpack_require__(2);
+
+var _game2 = _interopRequireDefault(_game);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+document.addEventListener('DOMContentLoaded', function () {
+  var canvas = document.getElementById("game-canvas");
+  var ctx = canvas.getContext("2d");
+  var game = new _game2.default(ctx);
+  // game.run();
+});
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _bike = __webpack_require__(0);
+
+var _bike2 = _interopRequireDefault(_bike);
+
+var _explosion = __webpack_require__(4);
+
+var _explosion2 = _interopRequireDefault(_explosion);
+
+var _bot = __webpack_require__(5);
+
+var _bot2 = _interopRequireDefault(_bot);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Game = function () {
+  function Game(ctx) {
+    _classCallCheck(this, Game);
+
+    this.ctx = ctx;
+    this.bikes = [new _bike2.default(200, 150, "blue", "E"), new _bike2.default(800, 150, "red", "S"), new _bike2.default(800, 600, "yellow", "W"), new _bike2.default(200, 600, "green", "N")];
+    this.walls = this.bikes.map(function (bike) {
+      return bike.wall;
+    });
+    this.explosions = [];
+    this.bots = [
+    // new Bot(this.bikes[0], this.walls),
+    new _bot2.default(this.bikes[1], this.walls), new _bot2.default(this.bikes[2], this.walls), new _bot2.default(this.bikes[3], this.walls)];
+    this.discoMode = true;
+    this.frameCount = 0;
+    this.style = Game.GRID_COLOR;
+  }
+
+  _createClass(Game, [{
+    key: 'bindKeyHandlers',
+    value: function bindKeyHandlers() {
+      var player1 = this.bikes[0];
+      // const player2 = this.bikes[1];
+      Object.keys(Game.PLAYER1_KEYS).forEach(function (k) {
+        key(k, function (e) {
+          e.preventDefault();
+          player1.move(Game.PLAYER1_KEYS[k]);
+        });
+      });
+
+      //   Object.keys(Game.PLAYER2_KEYS).forEach(k => {
+      //     key(k, (e) => {
+      //       e.preventDefault();
+      //       player2.move(Game.PLAYER2_KEYS[k]);
+      //     });
+      //   });
+    }
+  }, {
+    key: 'checkBoundaryCollisions',
+    value: function checkBoundaryCollisions() {
+      var _this = this;
+
+      this.bikes.forEach(function (bike, idx) {
+        if (bike.boundaryCollision()) {
+          // console.log("boundary collision detected");
+          _this.explosions.push(new _explosion2.default(bike.centerCoords()));
+          _this.bikes.splice(idx, 1);
+          _this.updateWalls();
+        }
+      });
+    }
+  }, {
+    key: 'checkWallCollisions',
+    value: function checkWallCollisions() {
+      var _this2 = this;
+
+      this.bikes.forEach(function (bike, idx) {
+        _this2.walls.forEach(function (wall) {
+          if (bike.wallCollision(wall)) {
+            // console.log("wall collision detected");
+            _this2.explosions.push(new _explosion2.default(bike.centerCoords()));
+            _this2.bikes.splice(idx, 1);
+            _this2.updateWalls();
+          }
+        });
+      });
+    }
+  }, {
+    key: 'updateWalls',
+    value: function updateWalls() {
+      var _this3 = this;
+
+      this.walls = this.bikes.map(function (bike) {
+        return bike.wall;
+      });
+      this.bots.forEach(function (bot) {
+        bot.walls = _this3.walls;
+      });
+    }
+  }, {
+    key: 'checkCollisions',
+    value: function checkCollisions() {
+      this.checkBoundaryCollisions();
+      this.checkWallCollisions();
+    }
+  }, {
+    key: 'moveBots',
+    value: function moveBots() {
+      this.bots.forEach(function (bot) {
+        bot.avoidObstacles();
+      });
+    }
+  }, {
+    key: 'run',
+    value: function run() {
+      this.bindKeyHandlers();
+      this.render();
+    }
+  }, {
+    key: 'allObjects',
+    value: function allObjects() {
+      // bikes render their own walls
+      return this.bikes.concat(this.explosions);
+    }
+  }, {
+    key: 'renderAllObjects',
+    value: function renderAllObjects() {
+      var _this4 = this;
+
+      this.allObjects().forEach(function (object) {
+        return object.render(_this4.ctx);
+      });
+    }
+  }, {
+    key: 'resetCanvas',
+    value: function resetCanvas() {
+      var discoLimit = 100 * Math.random();
+      this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
+      this.ctx.fillStyle = Game.BACKGROUND_COLOR;
+      this.ctx.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
+
+      this.ctx.lineWidth = 0.5;
+      this.ctx.beginPath();
+      for (var i = 0; i < Game.WIDTH; i += 40) {
+        this.ctx.moveTo(i, 0);
+        this.ctx.lineTo(i, Game.HEIGHT);
+      }
+      for (var j = 0; j < Game.HEIGHT; j += 40) {
+        this.ctx.moveTo(0, j);
+        this.ctx.lineTo(Game.WIDTH, j);
+      }
+      if (this.discoMode && this.frameCount > discoLimit) {
+        this.style = this.discoColor();
+        this.frameCount = 0;
+      }
+      this.frameCount++;
+      this.ctx.strokeStyle = this.style;
+      this.ctx.stroke();
+    }
+  }, {
+    key: 'discoColor',
+    value: function discoColor() {
+      return Game.DISCO_COLORS[Math.floor(Math.random() * Game.DISCO_COLORS.length)];
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      this.resetCanvas();
+      this.moveBots();
+      this.checkCollisions();
+      this.renderAllObjects();
+      requestAnimationFrame(this.render.bind(this));
+    }
+  }]);
+
+  return Game;
+}();
+
+Game.PLAYER1_KEYS = {
+  up: "N",
+  left: "W",
+  down: "S",
+  right: "E"
+};
+
+Game.PLAYER2_KEYS = {
+  w: "N",
+  a: "W",
+  s: "S",
+  d: "E"
+};
+
+Game.WIDTH = 1000;
+Game.HEIGHT = 750;
+Game.BACKGROUND_COLOR = "#333333";
+Game.GRID_COLOR = "darkviolet";
+Game.DISCO_COLORS = ["blue", "cyan", "fuchsia", "lime", "yellow", "crimson"];
+
+exports.default = Game;
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -622,7 +629,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _bike = __webpack_require__(2);
+var _bike = __webpack_require__(0);
 
 var _bike2 = _interopRequireDefault(_bike);
 
@@ -631,10 +638,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Bot = function () {
-  function Bot(bike) {
+  function Bot(bike, walls) {
     _classCallCheck(this, Bot);
 
     this.bike = bike;
+    this.walls = walls;
   }
 
   _createClass(Bot, [{
@@ -670,7 +678,14 @@ var Bot = function () {
       // console.log("checking near wall");
       // const pos = this.nextPosition();
       // const testBike = new Bike(pos[0], pos[1], this.bike.color, this.bike.direciton);
-      // return testBike.wallCollision(this.bike.wall);
+      // const result = this.walls.some((wall) => {
+      //   return testBike.wallCollision(wall);
+      // });
+      // // console.log("result: ", result);
+      // if (result) {
+      //   console.log("*****Detected upcoming wall collision");
+      // }
+      // return result;
     }
   }, {
     key: "nextPosition",

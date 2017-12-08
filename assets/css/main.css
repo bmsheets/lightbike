@@ -1,9 +1,7 @@
-/*footer {
-  margin-top: 50px;
-  height: 80px;
-  border-top: 3px solid cyan;
-  background-color: #333333;
-}*/
+footer {
+  position: absolute;
+  bottom: 20px;
+}
 
 body {
   background-color: black;
@@ -13,31 +11,86 @@ body {
 
 h1 {
   text-align: center;
-  font-size: 48px;
+  font-size: 52px;
   font-family: "Audiowide", sans-serif;
   color: white;
-  margin: 20px 0px;
+  margin: 30px 0px;
   text-shadow: 2px 2px cyan;
 }
 
-#game-canvas {
+button {
+  color: cyan;
+  background-color: black;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: 600;
+  font-family: "Audiowide", sans-serif;
+  border: 3px solid cyan;
+  border-radius: 5px;
+  text-align: center;
+}
+
+button:hover {
+  background-color: darkviolet;
+  transition: background-color 300ms ease-out;
+}
+
+#game-modes {
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
   margin: auto;
+  width: 60%;
+  height: 100%;
+}
+
+#game-modes h1 {
+  color: cyan;
+  text-shadow: 4px 4px black;
+  margin: 16px auto;
+}
+
+#game-canvas {
+  /*margin: auto;*/
+  /*display: block;*/
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 1;
+  border: 3px solid cyan;
+}
+
+#game-menu {
+  width: 1000px;
+  height: 750px;
+  /*display: block;*/
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  z-index: 2;
   display: block;
+  background-color: #333;
   border: 3px solid cyan;
 }
 
 #linkedin-icon {
   width: 68px;
   background-image: url("../linkedin.png");
+  margin-left: 30px;
 }
 
 #github-icon {
   width: 64px;
   background-image: url("../github.png");
+  margin-left: 20px
 }
 
 #linkedin-icon, #github-icon {
   height: 64px;
   display: inline-block;
-  margin-left: 20px;
+  /*margin-left: 40px;*/
 }
