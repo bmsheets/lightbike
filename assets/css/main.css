@@ -47,7 +47,25 @@ button:hover {
 #game-modes h1 {
   color: cyan;
   text-shadow: 4px 4px black;
-  margin: 16px auto;
+  margin: 12px auto;
+}
+
+#controls {
+  display: none;
+  flex-direction: row;
+  color: white;
+  font-size: 24px;
+  justify-content: space-around;
+  margin: auto;
+  align-items: center;
+  height: 100%;
+  font-family: "Audiowide", sans-serif;
+}
+
+#controls h3 {
+  font-size: 36px;
+  margin-bottom: 20px;
+  text-decoration: underline;
 }
 
 #game-canvas {

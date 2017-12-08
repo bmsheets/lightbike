@@ -280,12 +280,51 @@ var _game2 = _interopRequireDefault(_game);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-document.addEventListener('DOMContentLoaded', function () {
-  var canvas = document.getElementById("game-canvas");
-  var ctx = canvas.getContext("2d");
-  var game = new _game2.default(ctx);
-  // game.run();
+//
+// document.addEventListener('DOMContentLoaded', () => {
+//   const canvas = document.getElementById("game-canvas");
+//   const ctx = canvas.getContext("2d");
+//   const game = new Game(ctx);
+//   game.run();
+// });
+
+var GAME_MODES = [{ num_players: 1, num_bots: 1 }, { num_players: 1, num_bots: 3 }, { num_players: 2, num_bots: 0 }, { num_players: 2, num_bots: 2 }];
+
+var gameModeButtons = document.querySelectorAll("#game-modes button");
+gameModeButtons.forEach(function (button, idx) {
+  if (idx < 4) {
+    button.addEventListener("click", startGame(GAME_MODES[idx]));
+  } else {
+    button.addEventListener("click", displayControls);
+  }
 });
+
+function startGame(mode) {
+  return function () {
+    var menu = document.getElementById("game-menu");
+    menu.style.display = "none";
+    var canvas = document.getElementById("game-canvas");
+    var ctx = canvas.getContext("2d");
+    var game = new _game2.default(ctx, mode);
+    game.run();
+  };
+}
+
+function displayControls() {
+  var gameModes = document.getElementById("game-modes");
+  gameModes.style.display = "none";
+  var controls = document.getElementById("controls");
+  controls.style.display = "flex";
+  var back = document.getElementById("back-button");
+  back.addEventListener("click", displayModes);
+}
+
+function displayModes() {
+  var controls = document.getElementById("controls");
+  controls.style.display = "none";
+  var gameModes = document.getElementById("game-modes");
+  gameModes.style.display = "flex";
+}
 
 /***/ }),
 /* 2 */
@@ -317,28 +356,48 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Game = function () {
-  function Game(ctx) {
+  function Game(ctx, mode) {
     _classCallCheck(this, Game);
 
     this.ctx = ctx;
-    this.bikes = [new _bike2.default(200, 150, "blue", "E"), new _bike2.default(800, 150, "red", "S"), new _bike2.default(800, 600, "yellow", "W"), new _bike2.default(200, 600, "green", "N")];
+    this.mode = mode;
+    this.bikes = [new _bike2.default(200, 150, "blue", "E"), new _bike2.default(800, 150, "red", "S")];
+    console.log(this.mode.num_players);
+    if (this.mode.num_players + this.mode.num_bots > 2) {
+      this.bikes.push(new _bike2.default(800, 600, "yellow", "W"));
+      this.bikes.push(new _bike2.default(200, 600, "green", "N"));
+    }
     this.walls = this.bikes.map(function (bike) {
       return bike.wall;
     });
     this.explosions = [];
-    this.bots = [
-    // new Bot(this.bikes[0], this.walls),
-    new _bot2.default(this.bikes[1], this.walls), new _bot2.default(this.bikes[2], this.walls), new _bot2.default(this.bikes[3], this.walls)];
+    this.bots = [];
+    switch (this.mode.num_bots) {
+      case 1:
+        this.bots.push(new _bot2.default(this.bikes[1], this.walls));
+        break;
+      case 2:
+        this.bots.push(new _bot2.default(this.bikes[2], this.walls));
+        this.bots.push(new _bot2.default(this.bikes[3], this.walls));
+        break;
+      case 3:
+        this.bots.push(new _bot2.default(this.bikes[1], this.walls));
+        this.bots.push(new _bot2.default(this.bikes[2], this.walls));
+        this.bots.push(new _bot2.default(this.bikes[3], this.walls));
+        break;
+    }
     this.discoMode = true;
     this.frameCount = 0;
     this.style = Game.GRID_COLOR;
+    console.log("created new game with mode: ", this.mode);
+    console.log("created new game with bikes: ", this.bikes);
+    console.log("created new game with bots: ", this.bots);
   }
 
   _createClass(Game, [{
     key: 'bindKeyHandlers',
     value: function bindKeyHandlers() {
       var player1 = this.bikes[0];
-      // const player2 = this.bikes[1];
       Object.keys(Game.PLAYER1_KEYS).forEach(function (k) {
         key(k, function (e) {
           e.preventDefault();
@@ -346,12 +405,15 @@ var Game = function () {
         });
       });
 
-      //   Object.keys(Game.PLAYER2_KEYS).forEach(k => {
-      //     key(k, (e) => {
-      //       e.preventDefault();
-      //       player2.move(Game.PLAYER2_KEYS[k]);
-      //     });
-      //   });
+      if (this.mode.num_players === 2) {
+        var player2 = this.bikes[1];
+        Object.keys(Game.PLAYER2_KEYS).forEach(function (k) {
+          key(k, function (e) {
+            e.preventDefault();
+            player2.move(Game.PLAYER2_KEYS[k]);
+          });
+        });
+      }
     }
   }, {
     key: 'checkBoundaryCollisions',
@@ -413,6 +475,13 @@ var Game = function () {
     value: function run() {
       this.bindKeyHandlers();
       this.render();
+    }
+  }, {
+    key: 'gameOver',
+    value: function gameOver() {
+      if (this.bikes.length === 0) {
+        return true;
+      }return false;
     }
   }, {
     key: 'allObjects',
