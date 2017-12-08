@@ -532,11 +532,26 @@ var Game = function () {
   }, {
     key: 'render',
     value: function render() {
+      if (this.gameOver()) {
+        this.showRestart();
+        return;
+      }
       this.resetCanvas();
       this.moveBots();
       this.checkCollisions();
       this.renderAllObjects();
       requestAnimationFrame(this.render.bind(this));
+    }
+  }, {
+    key: 'showRestart',
+    value: function showRestart() {
+      var gameOver = document.getElementById("game-over");
+      var restart = document.getElementById("restart-button");
+      restart.addEventListener("click", function () {
+        document.getElementById("game-over").style.display = "none";
+        document.getElementById("game-menu").style.display = "flex";
+      });
+      gameOver.style.display = "flex";
     }
   }]);
 

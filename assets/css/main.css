@@ -68,6 +68,17 @@ button:hover {
   text-decoration: underline;
 }
 
+#game-over {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  margin: auto;
+  width: 500px;
+  display: none;
+  flex-direction: column;
+}
+
 #game-canvas {
   /*margin: auto;*/
   /*display: block;*/
