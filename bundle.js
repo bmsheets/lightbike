@@ -80,6 +80,10 @@ var _wall = __webpack_require__(3);
 
 var _wall2 = _interopRequireDefault(_wall);
 
+var _hitbox = __webpack_require__(6);
+
+var _hitbox2 = _interopRequireDefault(_hitbox);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -100,10 +104,11 @@ var Bike = function () {
     this.wall = new _wall2.default(this);
     this.wall.addVertex(this.centerCoords());
     this.wallCollision = this.wallCollision.bind(this);
+    this.hitBox = new _hitbox2.default(this);
   }
 
   _createClass(Bike, [{
-    key: "move",
+    key: 'move',
     value: function move(direction) {
       if (direction === this.direction) {
         return;
@@ -138,8 +143,9 @@ var Bike = function () {
       this.wall.addVertex(this.centerCoords());
     }
   }, {
-    key: "getVelocity",
+    key: 'getVelocity',
     value: function getVelocity() {
+      return [0, 0];
       switch (this.direction) {
         case "N":
           return [0, -Bike.SPEED];
@@ -152,7 +158,7 @@ var Bike = function () {
       }
     }
   }, {
-    key: "updatePos",
+    key: 'updatePos',
     value: function updatePos() {
       this.prevX = this.x;
       this.prevY = this.y;
@@ -160,7 +166,7 @@ var Bike = function () {
       this.y += this.velocity[1];
     }
   }, {
-    key: "boundaryCollision",
+    key: 'boundaryCollision',
     value: function boundaryCollision() {
       if (this.x < 20 || this.x > 960 || this.y < 0 || this.y > 700) {
         return true;
@@ -168,7 +174,7 @@ var Bike = function () {
       return false;
     }
   }, {
-    key: "wallCollision",
+    key: 'wallCollision',
     value: function wallCollision(wall) {
       var vertices = wall.vertices;
       for (var i = 1; i < vertices.length; i++) {
@@ -182,7 +188,7 @@ var Bike = function () {
       return false;
     }
   }, {
-    key: "betweenVertices",
+    key: 'betweenVertices',
     value: function betweenVertices(v1, v2) {
       var frontPosition = this.centerCoords();
       switch (this.direction) {
@@ -222,9 +228,10 @@ var Bike = function () {
       return false;
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render(ctx) {
       this.wall.render(ctx);
+      this.hitBox.render(ctx);
       this.updatePos();
       var centerCoords = this.centerCoords();
       ctx.save();
@@ -235,12 +242,12 @@ var Bike = function () {
       ctx.restore();
     }
   }, {
-    key: "rotationCoefficient",
+    key: 'rotationCoefficient',
     value: function rotationCoefficient() {
       return Bike.DIRECTIONS.indexOf(this.direction);
     }
   }, {
-    key: "centerCoords",
+    key: 'centerCoords',
     value: function centerCoords() {
       return [this.x + Bike.WIDTH / 2, this.y + Bike.LENGTH / 2];
     }
@@ -386,7 +393,7 @@ var Game = function () {
         this.bots.push(new _bot2.default(this.bikes[3], this.walls));
         break;
     }
-    this.discoMode = true;
+    this.discoMode = false;
     this.frameCount = 0;
     this.style = Game.GRID_COLOR;
     console.log("created new game with mode: ", this.mode);
@@ -823,6 +830,84 @@ var Bot = function () {
 }();
 
 exports.default = Bot;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var HitBox = function () {
+  function HitBox(bike) {
+    _classCallCheck(this, HitBox);
+
+    this.bike = bike;
+    this.vertices = [];
+  }
+
+  _createClass(HitBox, [{
+    key: "generateVertices",
+    value: function generateVertices() {
+      this.vertices = [];
+      var bikePos = this.bike.centerCoords();
+      switch (this.bike.direction) {
+        case "N":
+        case "S":
+          this.vertices.push([bikePos[0] - HitBox.WIDTH, bikePos[1] - HitBox.LENGTH]);
+          this.vertices.push([bikePos[0] + HitBox.WIDTH, bikePos[1] - HitBox.LENGTH]);
+          this.vertices.push([bikePos[0] + HitBox.WIDTH, bikePos[1] + HitBox.LENGTH]);
+          this.vertices.push([bikePos[0] - HitBox.WIDTH, bikePos[1] + HitBox.LENGTH]);
+          break;
+        case "E":
+        case "W":
+          this.vertices.push([bikePos[0] - HitBox.LENGTH, bikePos[1] - HitBox.WIDTH]);
+          this.vertices.push([bikePos[0] + HitBox.LENGTH, bikePos[1] - HitBox.WIDTH]);
+          this.vertices.push([bikePos[0] + HitBox.LENGTH, bikePos[1] + HitBox.WIDTH]);
+          this.vertices.push([bikePos[0] - HitBox.LENGTH, bikePos[1] + HitBox.WIDTH]);
+          break;
+      }
+    }
+  }, {
+    key: "render",
+    value: function render(ctx) {
+      this.generateVertices();
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      this.vertices.forEach(function (vertex, idx) {
+        if (idx === 0) {
+          ctx.moveTo(vertex[0], vertex[1]);
+        } else {
+          ctx.lineTo(vertex[0], vertex[1]);
+        }
+      });
+      var firstVertex = this.vertices[0];
+      ctx.lineTo(firstVertex[0], firstVertex[1]);
+      ctx.strokeStyle = "red";
+      ctx.stroke();
+    }
+  }, {
+    key: "addVertex",
+    value: function addVertex(coords) {
+      this.vertices.push(coords);
+    }
+  }]);
+
+  return HitBox;
+}();
+
+HitBox.WIDTH = 11;
+HitBox.LENGTH = 25;
+
+exports.default = HitBox;
 
 /***/ })
 /******/ ]);
