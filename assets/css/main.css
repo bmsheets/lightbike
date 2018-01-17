@@ -1,12 +1,18 @@
-footer {
-  position: absolute;
-  bottom: 20px;
+html {
+  height: 100%;
 }
 
 body {
   background-color: black;
   background-image: url("https://static.pexels.com/photos/110854/pexels-photo-110854.jpeg");
   background-size: cover;
+  min-height: 100%;
+  position: relative;
+}
+
+footer {
+  position: absolute;
+  bottom: 20px;
 }
 
 h1 {
@@ -44,10 +50,14 @@ button:hover {
   height: 100%;
 }
 
-#game-modes h1 {
+#game-modes h1,
+#game-over h1 {
   color: cyan;
   text-shadow: 4px 4px black;
-  margin: 12px auto;
+}
+
+#game-modes h1 {
+  margin: 0;
 }
 
 #controls {
@@ -60,6 +70,11 @@ button:hover {
   align-items: center;
   height: 100%;
   font-family: "Audiowide", sans-serif;
+}
+
+#p1-controls,
+#p2-controls {
+  margin-right: 40px;
 }
 
 #controls h3 {

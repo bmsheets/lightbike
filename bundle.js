@@ -80,9 +80,13 @@ var _wall = __webpack_require__(3);
 
 var _wall2 = _interopRequireDefault(_wall);
 
-var _hitbox = __webpack_require__(6);
+var _hitbox = __webpack_require__(4);
 
 var _hitbox2 = _interopRequireDefault(_hitbox);
+
+var _geometry = __webpack_require__(7);
+
+var _geometry2 = _interopRequireDefault(_geometry);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -145,7 +149,7 @@ var Bike = function () {
   }, {
     key: 'getVelocity',
     value: function getVelocity() {
-      return [0, 0];
+      // return [0, 0];
       switch (this.direction) {
         case "N":
           return [0, -Bike.SPEED];
@@ -186,6 +190,23 @@ var Bike = function () {
         return true;
       }
       return false;
+    }
+  }, {
+    key: 'wallCollision2',
+    value: function wallCollision2(wall) {
+      // console.log("this value in wallCollision: ", this);
+      var hitboxLines = this.hitBox.getLines();
+      var wallLines = [];
+
+      for (var i = 0; i < wall.vertices.length - 1; i++) {
+        wallLines.push([wall.vertices[i], wall.vertices[i + 1]]);
+      }
+
+      return wallLines.some(function (line1) {
+        return hitboxLines.some(function (line2) {
+          return _geometry2.default.intersection(line1, line2);
+        });
+      });
     }
   }, {
     key: 'betweenVertices',
@@ -231,7 +252,7 @@ var Bike = function () {
     key: 'render',
     value: function render(ctx) {
       this.wall.render(ctx);
-      this.hitBox.render(ctx);
+      // this.hitBox.render(ctx);
       this.updatePos();
       var centerCoords = this.centerCoords();
       ctx.save();
@@ -350,11 +371,11 @@ var _bike = __webpack_require__(0);
 
 var _bike2 = _interopRequireDefault(_bike);
 
-var _explosion = __webpack_require__(4);
+var _explosion = __webpack_require__(5);
 
 var _explosion2 = _interopRequireDefault(_explosion);
 
-var _bot = __webpack_require__(5);
+var _bot = __webpack_require__(6);
 
 var _bot2 = _interopRequireDefault(_bot);
 
@@ -658,6 +679,90 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var HitBox = function () {
+  function HitBox(bike) {
+    _classCallCheck(this, HitBox);
+
+    this.bike = bike;
+    this.vertices = [];
+  }
+
+  _createClass(HitBox, [{
+    key: "generateVertices",
+    value: function generateVertices() {
+      this.vertices = [];
+      var bikePos = this.bike.centerCoords();
+      switch (this.bike.direction) {
+        case "N":
+        case "S":
+          this.vertices.push([bikePos[0] - HitBox.WIDTH, bikePos[1] - HitBox.LENGTH]);
+          this.vertices.push([bikePos[0] + HitBox.WIDTH, bikePos[1] - HitBox.LENGTH]);
+          this.vertices.push([bikePos[0] + HitBox.WIDTH, bikePos[1] + HitBox.LENGTH]);
+          this.vertices.push([bikePos[0] - HitBox.WIDTH, bikePos[1] + HitBox.LENGTH]);
+          break;
+        case "E":
+        case "W":
+          this.vertices.push([bikePos[0] - HitBox.LENGTH, bikePos[1] - HitBox.WIDTH]);
+          this.vertices.push([bikePos[0] + HitBox.LENGTH, bikePos[1] - HitBox.WIDTH]);
+          this.vertices.push([bikePos[0] + HitBox.LENGTH, bikePos[1] + HitBox.WIDTH]);
+          this.vertices.push([bikePos[0] - HitBox.LENGTH, bikePos[1] + HitBox.WIDTH]);
+          break;
+      }
+    }
+  }, {
+    key: "render",
+    value: function render(ctx) {
+      this.generateVertices();
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      this.vertices.forEach(function (vertex, idx) {
+        if (idx === 0) {
+          ctx.moveTo(vertex[0], vertex[1]);
+        } else {
+          ctx.lineTo(vertex[0], vertex[1]);
+        }
+      });
+      var firstVertex = this.vertices[0];
+      ctx.lineTo(firstVertex[0], firstVertex[1]);
+      ctx.strokeStyle = "red";
+      ctx.stroke();
+    }
+  }, {
+    key: "addVertex",
+    value: function addVertex(coords) {
+      this.vertices.push(coords);
+    }
+  }, {
+    key: "getLines",
+    value: function getLines() {
+      if (this.vertices.length < 4) this.generateVertices();
+      return [[this.vertices[0], this.vertices[1]], [this.vertices[1], this.vertices[2]], [this.vertices[2], this.vertices[3]], [this.vertices[3], this.vertices[0]]];
+    }
+  }]);
+
+  return HitBox;
+}();
+
+HitBox.WIDTH = 11;
+HitBox.LENGTH = 25;
+
+exports.default = HitBox;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var Explosion = function () {
   function Explosion(coords) {
     _classCallCheck(this, Explosion);
@@ -708,7 +813,7 @@ Explosion.SPRITE = {
 exports.default = Explosion;
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -741,9 +846,9 @@ var Bot = function () {
     value: function avoidObstacles() {
       // console.log("Checking bot obstacles...");
       if (this.nearBoundary() || this.nearWall()) {
-        console.log("Obstacle detected");
+        // console.log("Obstacle detected");
         var move = this.chooseMove();
-        console.log("bot performing move: ", move);
+        // console.log("bot performing move: ", move);
         this.bike.move(move);
       } else {
         if (Math.random() < 0.05) {
@@ -758,7 +863,7 @@ var Bot = function () {
       var testBike = new _bike2.default(pos[0], pos[1], this.bike.color, this.bike.direciton);
       var result = testBike.boundaryCollision();
       if (result) {
-        console.log("Detected upcoming boundary collision");
+        // console.log("Detected upcoming boundary collision");
       }
       return result;
     }
@@ -832,82 +937,66 @@ var Bot = function () {
 exports.default = Bot;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var HitBox = function () {
-  function HitBox(bike) {
-    _classCallCheck(this, HitBox);
-
-    this.bike = bike;
-    this.vertices = [];
+var Geometry = function () {
+  function Geometry() {
+    _classCallCheck(this, Geometry);
   }
 
-  _createClass(HitBox, [{
-    key: "generateVertices",
-    value: function generateVertices() {
-      this.vertices = [];
-      var bikePos = this.bike.centerCoords();
-      switch (this.bike.direction) {
-        case "N":
-        case "S":
-          this.vertices.push([bikePos[0] - HitBox.WIDTH, bikePos[1] - HitBox.LENGTH]);
-          this.vertices.push([bikePos[0] + HitBox.WIDTH, bikePos[1] - HitBox.LENGTH]);
-          this.vertices.push([bikePos[0] + HitBox.WIDTH, bikePos[1] + HitBox.LENGTH]);
-          this.vertices.push([bikePos[0] - HitBox.WIDTH, bikePos[1] + HitBox.LENGTH]);
-          break;
-        case "E":
-        case "W":
-          this.vertices.push([bikePos[0] - HitBox.LENGTH, bikePos[1] - HitBox.WIDTH]);
-          this.vertices.push([bikePos[0] + HitBox.LENGTH, bikePos[1] - HitBox.WIDTH]);
-          this.vertices.push([bikePos[0] + HitBox.LENGTH, bikePos[1] + HitBox.WIDTH]);
-          this.vertices.push([bikePos[0] - HitBox.LENGTH, bikePos[1] + HitBox.WIDTH]);
-          break;
+  _createClass(Geometry, [{
+    key: "intersection",
+    value: function intersection(a, b) {
+      var _a = _slicedToArray(a, 2),
+          a1 = _a[0],
+          a2 = _a[1];
+
+      var _b = _slicedToArray(b, 2),
+          b1 = _b[0],
+          b2 = _b[1];
+
+      var cond1 = b1[0] >= Math.min(a1[0], a2[0]) && b1[0] <= Math.max(a1[0], a2[0]);
+      var cond2 = a1[1] >= Math.min(b1[1], b2[1]) && a1[1] <= Math.max(b1[1], b2[1]);
+      var cond3 = a1[0] >= Math.min(b1[0], b2[0]) && a1[0] <= Math.max(b1[0], b2[0]);
+      var cond4 = b1[1] >= Math.min(a1[1], a2[1]) && b1[1] <= Math.max(a1[1], a2[1]);
+      return cond1 && cond2 || cond3 && cond4;
+    }
+  }, {
+    key: "test",
+    value: function test() {
+      var a = void 0,
+          b = void 0;
+      var AVALS = [[[0, 1], [4, 1]], [[0, 1], [4, 1]], [[0, 1], [4, 1]], [[0, 3], [4, 3]], [[0, -1], [4, -1]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]]];
+
+      var BVALS = [[[1, 0], [1, 2]], [[-1, 0], [-1, 2]], [[4, 0], [4, 2]], [[1, 0], [1, 2]], [[1, 0], [1, 2]], [[0, -1], [3, -1]], [[0, 3], [3, 3]], [[0, -3], [3, -3]], [[0, 0], [3, 0]], [[0, 1], [3, 1]]];
+
+      var RESULTS = [true, false, false, false, false, true, false, false, true, true];
+
+      for (var i = 0; i < RESULTS.length; i++) {
+        a = AVALS[i];
+        b = BVALS[i];
+        console.log("testing case " + (i + 1) + "...");
+        console.assert(this.intersection(a, b) === RESULTS[i], "Failed test case " + (i + 1));
       }
-    }
-  }, {
-    key: "render",
-    value: function render(ctx) {
-      this.generateVertices();
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      this.vertices.forEach(function (vertex, idx) {
-        if (idx === 0) {
-          ctx.moveTo(vertex[0], vertex[1]);
-        } else {
-          ctx.lineTo(vertex[0], vertex[1]);
-        }
-      });
-      var firstVertex = this.vertices[0];
-      ctx.lineTo(firstVertex[0], firstVertex[1]);
-      ctx.strokeStyle = "red";
-      ctx.stroke();
-    }
-  }, {
-    key: "addVertex",
-    value: function addVertex(coords) {
-      this.vertices.push(coords);
+
+      console.log("All tests passed.");
     }
   }]);
 
-  return HitBox;
+  return Geometry;
 }();
 
-HitBox.WIDTH = 11;
-HitBox.LENGTH = 25;
-
-exports.default = HitBox;
+module.exports = Geometry;
 
 /***/ })
 /******/ ]);
