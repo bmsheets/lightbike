@@ -327,18 +327,18 @@ gameModeButtons.forEach(function (button, idx) {
   }
 });
 
-var soundIcon = document.querySelector("#sound-icon");
+var soundIcon = document.getElementById("sound-icon");
 var gameAudio = document.getElementById("game-audio");
 var audioPlaying = false;
 soundIcon.addEventListener("click", function () {
-  if (!audioPlaying) {
-    soundIcon.setAttribute("src", "assets/unmute.png");
-    gameAudio.play();
-    audioPlaying = true;
-  } else {
+  if (audioPlaying) {
     soundIcon.setAttribute("src", "assets/mute.png");
     gameAudio.pause();
     audioPlaying = false;
+  } else {
+    soundIcon.setAttribute("src", "assets/unmute.png");
+    gameAudio.play();
+    audioPlaying = true;
   }
 });
 
