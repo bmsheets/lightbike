@@ -117,7 +117,6 @@ button:hover {
 #game-menu {
   width: 1000px;
   height: 750px;
-  /*display: block;*/
   left: 0;
   right: 0;
   margin-left: auto;
@@ -127,6 +126,14 @@ button:hover {
   display: block;
   background-color: #333;
   border: 3px solid cyan;
+}
+
+#sound-icon {
+  width: 64px;
+  height: 64px;
+  position: absolute;
+  left: 20px;
+  cursor: pointer;
 }
 
 #linkedin-icon {
@@ -144,5 +151,4 @@ button:hover {
 #linkedin-icon, #github-icon {
   height: 64px;
   display: inline-block;
-  /*margin-left: 40px;*/
 }

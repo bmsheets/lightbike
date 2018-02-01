@@ -327,6 +327,21 @@ gameModeButtons.forEach(function (button, idx) {
   }
 });
 
+var soundIcon = document.querySelector("#sound-icon");
+var gameAudio = document.getElementById("game-audio");
+var audioPlaying = false;
+soundIcon.addEventListener("click", function () {
+  if (!audioPlaying) {
+    soundIcon.setAttribute("src", "assets/unmute.png");
+    gameAudio.play();
+    audioPlaying = true;
+  } else {
+    soundIcon.setAttribute("src", "assets/mute.png");
+    gameAudio.pause();
+    audioPlaying = false;
+  }
+});
+
 function startGame(mode) {
   return function () {
     var menu = document.getElementById("game-menu");
