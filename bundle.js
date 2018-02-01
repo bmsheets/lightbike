@@ -415,6 +415,7 @@ var Game = function () {
         break;
     }
     this.discoMode = false;
+    this.pulseMode = true;
     this.frameCount = 0;
     this.style = Game.GRID_COLOR;
     console.log("created new game with mode: ", this.mode);
@@ -529,6 +530,7 @@ var Game = function () {
   }, {
     key: 'resetCanvas',
     value: function resetCanvas() {
+      var opacity = void 0;
       var discoLimit = 100 * Math.random();
       this.ctx.clearRect(0, 0, Game.WIDTH, Game.HEIGHT);
       this.ctx.fillStyle = Game.BACKGROUND_COLOR;
@@ -547,6 +549,9 @@ var Game = function () {
       if (this.discoMode && this.frameCount > discoLimit) {
         this.style = this.discoColor();
         this.frameCount = 0;
+      } else if (this.pulseMode) {
+        opacity = 0.7 + 0.3 * Math.sin(this.frameCount / 20.0);
+        this.style = 'rgba(148, 0, 211, ' + opacity + ')';
       }
       this.frameCount++;
       this.ctx.strokeStyle = this.style;
@@ -603,7 +608,8 @@ Game.PLAYER2_KEYS = {
 Game.WIDTH = 1000;
 Game.HEIGHT = 750;
 Game.BACKGROUND_COLOR = "#333333";
-Game.GRID_COLOR = "darkviolet";
+// Game.GRID_COLOR = "darkviolet";
+Game.GRID_COLOR = "rgba(148, 0, 211, 1)";
 Game.DISCO_COLORS = ["blue", "cyan", "fuchsia", "lime", "yellow", "crimson"];
 
 exports.default = Game;
