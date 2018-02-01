@@ -43,11 +43,11 @@ button:hover {
 
 #game-modes {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-around;
   flex-direction: column;
-  margin: auto;
+  margin: 11.5% auto;
   width: 60%;
-  height: 100%;
+  height: 70%;
 }
 
 #game-modes h1,
@@ -63,7 +63,8 @@ button:hover {
 #controls {
   display: none;
   flex-direction: row;
-  color: white;
+  flex-wrap: wrap;
+  color: cyan;
   font-size: 24px;
   justify-content: space-around;
   margin: auto;
@@ -72,15 +73,22 @@ button:hover {
   font-family: "Audiowide", sans-serif;
 }
 
+#how-to-play {
+  padding: 54px 108px 0px 108px;
+}
+
 #p1-controls,
 #p2-controls {
-  margin-right: 40px;
 }
 
 #controls h3 {
-  font-size: 36px;
+  font-size: 30px;
   margin-bottom: 20px;
   text-decoration: underline;
+}
+
+#back-button {
+  width: 554px;
 }
 
 #game-over {
@@ -88,7 +96,7 @@ button:hover {
   left: 0;
   right: 0;
   z-index: 3;
-  margin: auto;
+  margin: 200px auto;
   width: 500px;
   display: none;
   flex-direction: column;

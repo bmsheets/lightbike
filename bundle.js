@@ -84,7 +84,7 @@ var _hitbox = __webpack_require__(4);
 
 var _hitbox2 = _interopRequireDefault(_hitbox);
 
-var _geometry = __webpack_require__(7);
+var _geometry = __webpack_require__(5);
 
 var _geometry2 = _interopRequireDefault(_geometry);
 
@@ -316,11 +316,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //   game.run();
 // });
 
-var GAME_MODES = [{ num_players: 1, num_bots: 1 }, { num_players: 1, num_bots: 3 }, { num_players: 2, num_bots: 0 }, { num_players: 2, num_bots: 2 }];
+var GAME_MODES = [{ num_players: 1, num_bots: 3 }, { num_players: 2, num_bots: 2 }];
 
 var gameModeButtons = document.querySelectorAll("#game-modes button");
 gameModeButtons.forEach(function (button, idx) {
-  if (idx < 4) {
+  if (idx < 2) {
     button.addEventListener("click", startGame(GAME_MODES[idx]));
   } else {
     button.addEventListener("click", displayControls);
@@ -371,11 +371,11 @@ var _bike = __webpack_require__(0);
 
 var _bike2 = _interopRequireDefault(_bike);
 
-var _explosion = __webpack_require__(5);
+var _explosion = __webpack_require__(6);
 
 var _explosion2 = _interopRequireDefault(_explosion);
 
-var _bot = __webpack_require__(6);
+var _bot = __webpack_require__(7);
 
 var _bot2 = _interopRequireDefault(_bot);
 
@@ -587,17 +587,17 @@ var Game = function () {
 }();
 
 Game.PLAYER1_KEYS = {
-  up: "N",
-  left: "W",
-  down: "S",
-  right: "E"
-};
-
-Game.PLAYER2_KEYS = {
   w: "N",
   a: "W",
   s: "S",
   d: "E"
+};
+
+Game.PLAYER2_KEYS = {
+  up: "N",
+  left: "W",
+  down: "S",
+  right: "E"
 };
 
 Game.WIDTH = 1000;
@@ -755,6 +755,68 @@ exports.default = HitBox;
 "use strict";
 
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Geometry = function () {
+  function Geometry() {
+    _classCallCheck(this, Geometry);
+  }
+
+  _createClass(Geometry, [{
+    key: "intersection",
+    value: function intersection(a, b) {
+      var _a = _slicedToArray(a, 2),
+          a1 = _a[0],
+          a2 = _a[1];
+
+      var _b = _slicedToArray(b, 2),
+          b1 = _b[0],
+          b2 = _b[1];
+
+      var cond1 = b1[0] >= Math.min(a1[0], a2[0]) && b1[0] <= Math.max(a1[0], a2[0]);
+      var cond2 = a1[1] >= Math.min(b1[1], b2[1]) && a1[1] <= Math.max(b1[1], b2[1]);
+      var cond3 = a1[0] >= Math.min(b1[0], b2[0]) && a1[0] <= Math.max(b1[0], b2[0]);
+      var cond4 = b1[1] >= Math.min(a1[1], a2[1]) && b1[1] <= Math.max(a1[1], a2[1]);
+      return cond1 && cond2 || cond3 && cond4;
+    }
+  }, {
+    key: "test",
+    value: function test() {
+      var a = void 0,
+          b = void 0;
+      var AVALS = [[[0, 1], [4, 1]], [[0, 1], [4, 1]], [[0, 1], [4, 1]], [[0, 3], [4, 3]], [[0, -1], [4, -1]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]]];
+
+      var BVALS = [[[1, 0], [1, 2]], [[-1, 0], [-1, 2]], [[4, 0], [4, 2]], [[1, 0], [1, 2]], [[1, 0], [1, 2]], [[0, -1], [3, -1]], [[0, 3], [3, 3]], [[0, -3], [3, -3]], [[0, 0], [3, 0]], [[0, 1], [3, 1]]];
+
+      var RESULTS = [true, false, false, false, false, true, false, false, true, true];
+
+      for (var i = 0; i < RESULTS.length; i++) {
+        a = AVALS[i];
+        b = BVALS[i];
+        console.log("testing case " + (i + 1) + "...");
+        console.assert(this.intersection(a, b) === RESULTS[i], "Failed test case " + (i + 1));
+      }
+
+      console.log("All tests passed.");
+    }
+  }]);
+
+  return Geometry;
+}();
+
+module.exports = Geometry;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -813,7 +875,7 @@ Explosion.SPRITE = {
 exports.default = Explosion;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -935,68 +997,6 @@ var Bot = function () {
 }();
 
 exports.default = Bot;
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Geometry = function () {
-  function Geometry() {
-    _classCallCheck(this, Geometry);
-  }
-
-  _createClass(Geometry, [{
-    key: "intersection",
-    value: function intersection(a, b) {
-      var _a = _slicedToArray(a, 2),
-          a1 = _a[0],
-          a2 = _a[1];
-
-      var _b = _slicedToArray(b, 2),
-          b1 = _b[0],
-          b2 = _b[1];
-
-      var cond1 = b1[0] >= Math.min(a1[0], a2[0]) && b1[0] <= Math.max(a1[0], a2[0]);
-      var cond2 = a1[1] >= Math.min(b1[1], b2[1]) && a1[1] <= Math.max(b1[1], b2[1]);
-      var cond3 = a1[0] >= Math.min(b1[0], b2[0]) && a1[0] <= Math.max(b1[0], b2[0]);
-      var cond4 = b1[1] >= Math.min(a1[1], a2[1]) && b1[1] <= Math.max(a1[1], a2[1]);
-      return cond1 && cond2 || cond3 && cond4;
-    }
-  }, {
-    key: "test",
-    value: function test() {
-      var a = void 0,
-          b = void 0;
-      var AVALS = [[[0, 1], [4, 1]], [[0, 1], [4, 1]], [[0, 1], [4, 1]], [[0, 3], [4, 3]], [[0, -1], [4, -1]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]], [[2, 2], [2, -2]]];
-
-      var BVALS = [[[1, 0], [1, 2]], [[-1, 0], [-1, 2]], [[4, 0], [4, 2]], [[1, 0], [1, 2]], [[1, 0], [1, 2]], [[0, -1], [3, -1]], [[0, 3], [3, 3]], [[0, -3], [3, -3]], [[0, 0], [3, 0]], [[0, 1], [3, 1]]];
-
-      var RESULTS = [true, false, false, false, false, true, false, false, true, true];
-
-      for (var i = 0; i < RESULTS.length; i++) {
-        a = AVALS[i];
-        b = BVALS[i];
-        console.log("testing case " + (i + 1) + "...");
-        console.assert(this.intersection(a, b) === RESULTS[i], "Failed test case " + (i + 1));
-      }
-
-      console.log("All tests passed.");
-    }
-  }]);
-
-  return Geometry;
-}();
-
-module.exports = Geometry;
 
 /***/ })
 /******/ ]);
