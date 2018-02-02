@@ -112,6 +112,8 @@ button:hover {
   margin-right: auto;
   z-index: 1;
   border: 3px solid cyan;
+  width: 1000px;
+  height: 750px;
 }
 
 #game-menu {
